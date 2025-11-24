@@ -31,7 +31,7 @@ unsigned char* Canny(unsigned char* buffer, int width, int height, int comps, fl
 		    denoised[((i)*width+j)*comps+3] = 255; //a
       	}
     }
-    stbi_write_png("Denoised.png", width, height, comps, denoised, width * comps);
+    stbi_write_png("./pictures/Denoised.png", width, height, comps, denoised, width * comps);
 	
 	//sobel
 
@@ -113,7 +113,7 @@ unsigned char* Canny(unsigned char* buffer, int width, int height, int comps, fl
             grad[(width*i+j)*comps+3]= 255;
       	}
     }
-    stbi_write_png("Gradient.png", width, height,comps, grad, width * comps);
+    stbi_write_png("./pictures/Gradient.png", width, height,comps, grad, width * comps);
 	
     //unsigned char*  nonmax = new unsigned char[width*height*comps];
     //non-max suppression
@@ -164,7 +164,7 @@ unsigned char* Canny(unsigned char* buffer, int width, int height, int comps, fl
             grad[(width*i+j)*comps+3]= 255;
       	}
     }
-    stbi_write_png("NonMax.png", width, height, comps, grad, width * comps);
+    stbi_write_png("./pictures/NonMax.png", width, height, comps, grad, width * comps);
 	
 
     //double treshlolding
@@ -197,7 +197,7 @@ unsigned char* Canny(unsigned char* buffer, int width, int height, int comps, fl
             grad[(width*i+j)*comps+3]= 255;
       	}
     }
-    stbi_write_png("DoubleTreshold.png", width, height, comps, grad, width * comps);
+    stbi_write_png("./pictures/DoubleTreshold.png", width, height, comps, grad, width * comps);
 	
     //hysteresis
     unsigned char* cannyResult = (unsigned char*)malloc(width*height*comps);
@@ -358,14 +358,7 @@ unsigned char* Floyd(unsigned char* buffer, int width, int height, int comps)
                 int newValue = buffer[(i*width+j)*comps]/16;
                 int error = buffer[(i*width+j)*comps] % 16;
                 //spread error in buffer
-                if(j<width-1)
-                {
-                    buffer[(i*width+j+1)*comps] += error*7/16;
-                    if (i<height-1)
-                    {
-                        buffer[((i+1)*width+j+1)*comps] += error*1/16;
-                    }
-                }
+                
                 if (i<height-1)
                 {
                     if(j>0)
@@ -373,7 +366,23 @@ unsigned char* Floyd(unsigned char* buffer, int width, int height, int comps)
                         buffer[((i+1)*width+j-1)*comps] += error*3/16;
                     }
                     buffer[((i+1)*width+j)*comps] += error*5/16;
+                    if (j < width - 1)
+                    {
+                        buffer[(i * width + j + 1) * comps] += error * 7 / 16;
+                        
+                        buffer[((i + 1) * width + j + 1) * comps] += error * 1 / 16;
+                        
+                    }
                 }
+                else
+                {
+                    if (j < width - 1)
+                    {
+                        //distribute the entire error to the pixel to the right
+                        buffer[(i * width + j + 1) * comps] += error ;
+                    }
+                }
+                
                 int clampedValue = clamp(newValue*16, 0,255);
                 floyd[(i*width +j)*comps]=clampedValue;
                 floyd[(i*width +j)*comps+1]=clampedValue;
