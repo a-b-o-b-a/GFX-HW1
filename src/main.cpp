@@ -217,7 +217,77 @@ unsigned char* Canny(unsigned char* buffer, int width, int height, int comps, fl
                     
                     for (int y = -1; y <= 1; y++)
                     {
-                        if (cannyResult[(width * (i + y) + j + x) * comps] == 255)
+                        
+                        if ((x!=0 || y!=0) && cannyResult[(width * (i + y) + j + x) * comps] == 255)
+                        {
+                            counter++;
+                        }
+                    }
+                }
+                //at least 1 strong pixel in radius (including itself)
+                if(counter>0)
+                {
+                    newVal=255;
+                }
+                cannyResult[(width * i + j) * comps] = newVal;
+                cannyResult[(width * i + j) * comps + 1] = newVal;
+                cannyResult[(width * i + j) * comps + 2] = newVal;
+            }
+            
+        }
+    }
+    //second pass (bottom to top)
+
+    for (int i = height-1; i >0; i--)
+    {
+        for (int j = 1; j < width - 1; j++)
+        {
+            // check neighbors for strong edges if edge is weak
+            if (grad[(width * i + j) * comps] != 0 )
+            {
+                int newVal = 0;
+                int counter=0;
+                for (int x = -1; x <= 1; x++)
+                {
+                    
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        
+                        if ((x!=0 || y!=0) && cannyResult[(width * (i + y) + j + x) * comps] == 255)
+                        {
+                            counter++;
+                        }
+                    }
+                }
+                //at least 1 strong pixel in radius (including itself)
+                if(counter>0)
+                {
+                    newVal=255;
+                }
+                cannyResult[(width * i + j) * comps] = newVal;
+                cannyResult[(width * i + j) * comps + 1] = newVal;
+                cannyResult[(width * i + j) * comps + 2] = newVal;
+            }
+            
+        }
+    }
+    //third pass (right to left)
+    for (int i = height-1; i >0; i--)
+    {
+        for (int j = width-1; j >0; j--)
+        {
+            // check neighbors for strong edges if edge is weak
+            if (grad[(width * i + j) * comps] != 0 )
+            {
+                int newVal = 0;
+                int counter=0;
+                for (int x = -1; x <= 1; x++)
+                {
+                    
+                    for (int y = -1; y <= 1; y++)
+                    {
+                        
+                        if ((x!=0 || y!=0) && cannyResult[(width * (i + y) + j + x) * comps] == 255)
                         {
                             counter++;
                         }
@@ -424,7 +494,7 @@ int main(void)
     int result = stbi_write_png("./pictures/Grayscale.png", width, height, req_comps, buffer, width * comps);
     std::cout << result << std::endl;
     //canny
-	unsigned char* canny = Canny(buffer,width,height,comps, 0.2f, 0.6f);
+	unsigned char* canny = Canny(buffer,width,height,comps, 0.22f, 0.66f);
     result = stbi_write_png("./pictures/Canny.png", width, height, req_comps, canny, width * comps);
 	std::cout << result << std::endl;
     //Halftone
